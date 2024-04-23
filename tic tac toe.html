@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe Game</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            width: 300px; /* Adjust width for larger screens */
+        }
+
+        h1 {
+            color: #ff5733;
+            font-size: 36px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+
+        td {
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #555;
+            font-size: 36px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        td.x {
+            color: blue;
+        }
+
+        td.o {
+            color: red;
+        }
+
+        td.win {
+            background-color: yellow;
+        }
+
+        #reset {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #ff5733;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        #reset:hover {
+            background-color: #e5472c;
+        }
+
+        #playerNames {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #ddd;
+        }
+
+        #playerXName, #playerOName {
+            border: none;
+            background-color: #444;
+            border-radius: 5px;
+            padding: 5px;
+            margin: 5px;
+            color: #ddd;
+        }
+
+        #nextPlayerBox {
+            border: 2px solid #3498db;
+            background-color: #444;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        #nextPlayerLabel {
+            font-size: 18px;
+            color: #ddd;
+        }
+
+        #nextPlayer {
+            font-size: 24px;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        #tieMessage {
+            font-size: 24px;
+            color: #e74c3c;
+            margin-top: 20px;
+            display: none;
+        }
+
+        #options {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #ddd;
+        }
+
+        #options label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #options input[type="checkbox"] {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tic Tac Toe Game</h1>
+        <div id="options">
+            <label>
+                <input type="checkbox" id="showOptions" onclick="toggleOptions()"> Show Options
+            </label>
+            <div id="optionsContent" style="display: none;">
+                <label>
+                    Player X's Name: <input type="text" id="playerXName" value="Player X">
+                </label>
+                <label>
+                    Player O's Name: <input type="text" id="playerOName" value="Player O">
+                </label>
+            </div>
+        </div>
+        <table>
+            <tr>
+                <td id="1"></td>
+                <td id="2"></td>
+                <td id="3"></td>
+            </tr>
+            <tr>
+                <td id="4"></td>
+                <td id="5"></td>
+                <td id="6"></td>
+            </tr>
+            <tr>
+                <td id="7"></td>
+                <td id="8"></td>
+                <td id="9"></td>
+            </tr>
+        </table>
+        <div id="nextPlayerBox">
+            <div id="nextPlayerLabel">Next Player:</div>
+            <div id="nextPlayer">Player X</div>
+        </div>
+        <div id="tieMessage">It's a Tie!</div>
+        <button id="reset">Reset</button>
+    </div>
+    <script>
+        let playerSymbol = "X";
+        let gameEnded = false;
+        let possibleWinPositions = [
+            [1, 2, 3], [4, 5, 6], [7, 8, 9],
+            [1, 4, 7], [2, 5, 8], [3, 6, 9],
+            [1, 5, 9], [3, 5, 7]
+        ];
+
+        const nextPlayerLabel = document.getElementById("nextPlayerLabel");
+        const nextPlayerDisplay = document.getElementById("nextPlayer");
+        const tieMessage = document.getElementById("tieMessage");
+
+        function updateNextPlayerDisplay() {
+            nextPlayerDisplay.textContent = playerSymbol === "X" ? document.getElementById('playerXName').value : document.getElementById('playerOName').value;
+        }
+
+        updateNextPlayerDisplay();
+
+        for (let i = 1; i <= 9; i++) {
+            const cell = document.getElementById(i.toString());
+
+            cell.addEventListener("click", function () {
+                if (this.innerHTML === "" && !gameEnded) {
+                    this.innerHTML = playerSymbol;
+                    this.classList.add(playerSymbol.toLowerCase());
+                    checkWin();
+                    playerSymbol = playerSymbol === "X" ? "O" : "X";
+                    updateNextPlayerDisplay();
+                }
+            });
+        }
+
+        function checkWin() {
+            for (let i = 0; i < possibleWinPositions.length; i++) {
+                const [a, b, c] = possibleWinPositions[i];
+                const cellA = document.getElementById(a.toString());
+                const cellB = document.getElementById(b.toString());
+                const cellC = document.getElementById(c.toString());
+
+                if (
+                    cellA.innerHTML === playerSymbol &&
+                    cellB.innerHTML === playerSymbol &&
+                    cellC.innerHTML === playerSymbol
+                ) {
+                    const playerName = playerSymbol === "X" ? document.getElementById('playerXName').value : document.getElementById('playerOName').value;
+                    alert(playerName + " wins!");
+                    cellA.classList.add("win");
+                    cellB.classList.add("win");
+                    cellC.classList.add("win");
+                    gameEnded = true;
+                }
+            }
+
+            if (!gameEnded && !Array.from(document.querySelectorAll("td")).some(cell => cell.innerHTML === "")) {
+                tieMessage.style.display = "block";
+                gameEnded = true;
+            }
+        }
+
+        const resetButton = document.getElementById("reset");
+        resetButton.addEventListener("click", function () {
+            for (let i = 1; i <= 9; i++) {
+                const cell = document.getElementById(i.toString());
+                cell.innerHTML = "";
+                cell.classList.remove("x");
+                cell.classList.remove("o");
+                cell.classList.remove("win");
+                gameEnded = false;
+                tieMessage.style.display = "none";
+            }
+            playerSymbol = "X";
+            updateNextPlayerDisplay();
+        });
+
+        function toggleOptions() {
+            const showOptions = document.getElementById("showOptions");
+            const optionsContent = document.getElementById("optionsContent");
+
+            if (showOptions.checked) {
+                optionsContent.style.display = "block";
+            } else {
+                optionsContent.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
